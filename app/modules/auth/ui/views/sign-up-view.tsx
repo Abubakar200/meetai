@@ -35,6 +35,7 @@ const formSchema = z
 export const SignUpView = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [socialProvider, setSocialProvider] = useState<"google" | "github" | null>(null);
 
   const form = useForm<SignUpForm>({
     defaultValues: {
@@ -84,6 +85,23 @@ export const SignUpView = () => {
       router.replace("/");
     } catch {
       setError("Unable to create your account right now. Please try again.");
+    }
+  };
+
+  const onSocialSignUp = async (provider: "google" | "github") => {
+    setError(null);
+    setSocialProvider(provider);
+
+    try {
+      const response = await authClient.signIn.social({ provider });
+
+      if (response.error) {
+        setError(response.error.message ?? `Unable to sign up with ${provider}.`);
+      }
+    } catch {
+      setError(`Unable to sign up with ${provider}. Please try again.`);
+    } finally {
+      setSocialProvider(null);
     }
   };
 
@@ -166,9 +184,48 @@ export const SignUpView = () => {
                 </Field>
               </div>
 
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={form.formState.isSubmitting || socialProvider !== null}
+              >
                 {form.formState.isSubmitting ? "Creating account..." : "Create account"}
               </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or sign up with
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-center gap-2"
+                  onClick={() => onSocialSignUp("google")}
+                  disabled={form.formState.isSubmitting || socialProvider !== null}
+                >
+                  <img src="/google.svg" alt="" className="size-4" />
+                  {socialProvider === "google" ? "Connecting..." : "Google"}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-center gap-2"
+                  onClick={() => onSocialSignUp("github")}
+                  disabled={form.formState.isSubmitting || socialProvider !== null}
+                >
+                  <img src="/github.svg" alt="" className="size-4" />
+                  {socialProvider === "github" ? "Connecting..." : "GitHub"}
+                </Button>
+              </div>
 
               <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}

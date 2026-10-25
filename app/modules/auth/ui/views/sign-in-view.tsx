@@ -84,10 +84,10 @@ export const SignInView = () => {
 
       if (response.error) {
         setError(response.error.message ?? `Unable to sign in with ${provider}.`);
+        setSocialProvider(null);
       }
     } catch {
       setError(`Unable to sign in with ${provider}. Please try again.`);
-    } finally {
       setSocialProvider(null);
     }
   };
@@ -180,8 +180,15 @@ export const SignInView = () => {
                   onClick={() => onSocialSignIn("google")}
                   disabled={form.formState.isSubmitting || socialProvider !== null}
                 >
-                  <img src="/google.svg" alt="" className="size-4" />
-                  {socialProvider === "google" ? "Connecting..." : "Google"}
+                  {socialProvider === "google" ? (
+                    <span
+                      aria-hidden="true"
+                      className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+                    />
+                  ) : (
+                    <img src="/google.svg" alt="" className="size-4" />
+                  )}
+                  {socialProvider === "google" ? "Redirecting..." : "Google"}
                 </Button>
 
                 <Button
@@ -191,8 +198,15 @@ export const SignInView = () => {
                   onClick={() => onSocialSignIn("github")}
                   disabled={form.formState.isSubmitting || socialProvider !== null}
                 >
-                  <img src="/github.svg" alt="" className="size-4" />
-                  {socialProvider === "github" ? "Connecting..." : "GitHub"}
+                  {socialProvider === "github" ? (
+                    <span
+                      aria-hidden="true"
+                      className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+                    />
+                  ) : (
+                    <img src="/github.svg" alt="" className="size-4" />
+                  )}
+                  {socialProvider === "github" ? "Redirecting..." : "GitHub"}
                 </Button>
               </div>
 
