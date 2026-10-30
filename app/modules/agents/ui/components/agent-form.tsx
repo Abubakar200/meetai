@@ -44,7 +44,7 @@ export const AgentForm = ({
   const name = useWatch({ control: form.control, name: "name" });
 
   const invalidateAgentQueries = async () => {
-    await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions());
+    await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
 
     if (initialValues?.id) {
       await queryClient.invalidateQueries(

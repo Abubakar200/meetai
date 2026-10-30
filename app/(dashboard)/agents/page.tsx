@@ -2,9 +2,11 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { connection } from "next/server";
-
+import {
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+} from "@/app/constants";
 import { getQueryClient, trpc } from "../../trpc/server";
-
 import { 
   AgentsView, 
   AgentsViewError, 
@@ -15,17 +17,42 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const AgentsPageContent = async () => {
-  await connection();
-  const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+type SearchParams = Record<string, string | string[] | undefined>;
 
-    if (!session) {
-      redirect("/auth/sign-in");
-    }
+interface Props {
+  searchParams: Promise<SearchParams>;
+}
+
+const AgentsPageContent = async ({ searchParams }: Props) => {
+  await connection();
+  const params = await searchParams;
+  const pageParam = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(pageParam);
+  const filters = {
+    page:
+      Number.isSafeInteger(parsedPage) && parsedPage > 0
+        ? parsedPage
+        : DEFAULT_PAGE,
+    pageSize: DEFAULT_PAGE_SIZE,
+    search: Array.isArray(params.search)
+      ? params.search[0] ?? ""
+      : params.search ?? "",
+  };
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(trpc.agents.getMany.queryOptions());
+  void queryClient.prefetchQuery(
+    trpc.agents.getMany.queryOptions({
+      ...filters,
+    }),
+  );
 
   return (
     <>
@@ -41,9 +68,9 @@ const AgentsPageContent = async () => {
   );
 };
 
-const Page = () => (
+const Page = ({ searchParams }: Props) => (
   <Suspense fallback={<AgentsViewLoading />}>
-    <AgentsPageContent />
+    <AgentsPageContent searchParams={searchParams} />
   </Suspense>
 );
 

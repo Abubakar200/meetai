@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "./trpc/client";
 import { Toaster } from "@/components/ui/toast";
+import { NuqsAdapter } from "nuqs/adapters/next";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -17,16 +18,19 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
+      <NuqsAdapter>
+
     <TRPCReactProvider>
     <html
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
-    >
+      >
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <Toaster />
       </body>
     </html>
     </TRPCReactProvider>
+      </NuqsAdapter>
   );
 }
