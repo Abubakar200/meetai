@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-
+import { TRPCReactProvider } from "./trpc/client";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -14,12 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+
   return (
+    <TRPCReactProvider>
     <html
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
+    </TRPCReactProvider>
   );
 }
