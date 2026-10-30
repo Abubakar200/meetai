@@ -77,6 +77,8 @@ export const AgentForm = ({
           description: error.message,
           type: "error",
         });
+
+        // TODO: Check if error code is "FORBIDDEN", redirect to "/upgrade"
       },
     }),
   );
