@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "./trpc/client";
+import { Toaster } from "@/components/ui/toast";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -21,7 +22,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+        <Toaster />
+      </body>
     </html>
     </TRPCReactProvider>
   );
