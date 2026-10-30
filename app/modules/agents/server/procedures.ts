@@ -2,7 +2,7 @@ import { db } from "../../../db";
 import { agents } from "../../../db/schema";
 import { createTRPCRouter, protectedProcedure } from "../../../trpc/init";
 import { z } from "zod";
-import { and, count, desc, eq, getTableColumns, ilike, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, ilike, isNull, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { agentsInsertSchema, agentsUpdateSchema } from "../schemas";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, MIN_PAGE_SIZE } from "../../../../app/constants";
@@ -19,6 +19,7 @@ export const agentsRouter = createTRPCRouter({
           and(
             eq(agents.id, input.id),
             eq(agents.userId, ctx.auth.user.id),
+            isNull(agents.deletedAt),
           )
         )
         .returning();
@@ -36,12 +37,18 @@ export const agentsRouter = createTRPCRouter({
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const deletedAt = new Date();
       const [removedAgent] = await db
-        .delete(agents)
+        .update(agents)
+        .set({
+          deletedAt,
+          updatedAt: deletedAt,
+        })
         .where(
           and(
             eq(agents.id, input.id),
             eq(agents.userId, ctx.auth.user.id),
+            isNull(agents.deletedAt),
           ),
         )
         .returning();
@@ -70,6 +77,7 @@ export const agentsRouter = createTRPCRouter({
           and(
             eq(agents.id, input.id),
             eq(agents.userId, ctx.auth.user.id),
+            isNull(agents.deletedAt),
           )
         );
 
@@ -104,6 +112,7 @@ export const agentsRouter = createTRPCRouter({
         .where(
           and(
             eq(agents.userId, ctx.auth.user.id),
+            isNull(agents.deletedAt),
             search ? ilike(agents.name, `%${search}%`) : undefined,
           )
         )
@@ -117,6 +126,7 @@ export const agentsRouter = createTRPCRouter({
         .where(
           and(
             eq(agents.userId, ctx.auth.user.id),
+            isNull(agents.deletedAt),
             search ? ilike(agents.name, `%${search}%`) : undefined,
           )
         );
