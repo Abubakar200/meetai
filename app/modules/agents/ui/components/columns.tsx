@@ -1,17 +1,13 @@
 "use client"
 
-import type { inferRouterOutputs } from "@trpc/server"
 import type { LegacyColumnDef } from "@tanstack/react-table/legacy"
 import { CornerDownRightIcon, VideoIcon } from "lucide-react"
 
-import type { AppRouter } from "@/app/trpc/routers/_app"
 import { Badge } from "@/components/ui/badge"
 import { GeneratedAvatar } from "@/components/generated-avatar"
+import type { AgentsGetMany } from "../../types"
 
-type Agent =
-  inferRouterOutputs<AppRouter>["agents"]["getMany"]["items"][number]
-
-export const columns: LegacyColumnDef<Agent, unknown>[] = [
+export const columns: LegacyColumnDef<AgentsGetMany[number], unknown>[] = [
   {
     accessorKey: "name",
     header: "Agent Name",
@@ -46,5 +42,5 @@ export const columns: LegacyColumnDef<Agent, unknown>[] = [
         {row.original.meetingCount} {row.original.meetingCount === 1 ? "meeting" : "meetings"}
       </Badge>
     )
-  }
+  },
 ]

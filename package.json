@@ -31,6 +31,7 @@
     "dotenv": "^18.0.9",
     "drizzle-orm": "^0.45.4",
     "embla-carousel-react": "^8.6.0",
+    "humanize-duration": "^3.35.1",
     "input-otp": "^1.5.0",
     "lucide-react": "^1.61.0",
     "nanoid": "^6.0.2",
@@ -51,6 +52,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/humanize-duration": "^3.27.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
